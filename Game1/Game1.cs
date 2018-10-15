@@ -31,15 +31,16 @@ namespace Game1
         /// 
         protected void SetPaddle()
         {
-            PaddlePosition = new Vector2(this.GraphicsDevice.Viewport.Width / 4, this.GraphicsDevice.Viewport.Height * 0.8f);
-            paddle = new Texture2D(this.GraphicsDevice, 100, 10);
-            Color[] color = new Color[100 * 10];
+            PaddlePosition = new Vector2(this.GraphicsDevice.Viewport.Width / 2 - 80, this.GraphicsDevice.Viewport.Height * 0.835f);
+            paddle = new Texture2D(this.GraphicsDevice, 160, 40);
+            Color[] color = new Color[160 * 40];
             for (int i = 0; i < color.Length - 1; i++)
             {
                 color[i] = Color.Red;
             }
             paddle.SetData<Color>(color);
         }
+
         protected void DrawWall(int tab_index,float pos_x, float pos_y, int tex_width, int tex_height)
         {
             WallPosition[tab_index] = new Vector2(pos_x, pos_y);
@@ -48,7 +49,8 @@ namespace Game1
             for (int i = 0; i < color.Length - 1; i++) color[i] = Color.Black;
             wall[tab_index].SetData<Color>(color);
         }
-        protected void DrawWall(int tab_index, float pos_x, float pos_y, int tex_width, int tex_height,Color tex_color)
+
+        protected void DrawWall(int tab_index, float pos_x, float pos_y, int tex_width, int tex_height, Color tex_color)
         {
             WallPosition[tab_index] = new Vector2(pos_x, pos_y);
             wall[tab_index] = new Texture2D(GraphicsDevice, tex_width, tex_height);
@@ -56,12 +58,14 @@ namespace Game1
             for (int i = 0; i < color.Length - 1; i++) color[i] = tex_color;
             wall[tab_index].SetData<Color>(color);
         }
+
         protected void SetWalls()
         {
-            DrawWall(0, 100, 100, 35, 150);
-            DrawWall(1, 135, 100, 550, 35);
-            DrawWall(2, 650, 100, 35, 150);
+            DrawWall(0, 120, 40, 40, 160);
+            DrawWall(1, 120, 40, 560, 40);
+            DrawWall(2, 640, 40, 40, 160);
         }
+
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
