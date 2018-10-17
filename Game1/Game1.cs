@@ -11,6 +11,15 @@ namespace Game1
     /// </summary>
     public class Game1 : Game
     {
+        enum GameState
+        {
+            MainMenu,
+            Gameplay,
+            EndOfGame,
+        }
+
+        GameState gameState;
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Vector2 PaddlePosition;
@@ -30,8 +39,6 @@ namespace Game1
         bool directionY = true;//true->gora...false->dol
         bool gameStatus = true;//true->gra aktywna....false->przerwanie gry
         
-
-
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -55,8 +62,7 @@ namespace Game1
             {
                 color[i] = Color.Red;
             }
-            paddle.SetData<Color>(color);
-            
+            paddle.SetData<Color>(color);         
         }
 
         protected void DrawWall(int tab_index,float pos_x, float pos_y, int tex_width, int tex_height)
@@ -76,6 +82,7 @@ namespace Game1
             for (int i = 0; i < color.Length - 1; i++) color[i] = tex_color;
             wall[tab_index].SetData<Color>(color);
         }
+
         protected void DrawBall()
         {
             /*(PaddlePosition.X + PaddlePosition.X / 2), (PaddlePosition.Y + paddle.Height)*/
@@ -174,11 +181,35 @@ namespace Game1
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))Exit();
+            base.Update(gameTime);
+            switch (gameState)
+            {
+                case GameState.MainMenu:
+                    UpdateMainMenu(gameTime);
+                    break;
+                case GameState.Gameplay:
+                    UpdateGameplay(gameTime);
+                    break;
+                case GameState.EndOfGame:
+                    UpdateEndOfGame(gameTime);
+                    break;
+            }
+        }
+
+        private void UpdateMainMenu(GameTime deltaTime)
+        {
+            // Respond to user input for menu selections, etc
+            //if (pushedStartGameButton)
+                gameState = GameState.Gameplay;
+        }
+
+        private void UpdateGameplay(GameTime deltaTime)
+        {
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape)) Exit();
             if (Keyboard.GetState().IsKeyDown(Keys.Left) && (PaddlePosition.X) != GraphicsDevice.Viewport.X) PaddlePosition.X -= 5;
             if (Keyboard.GetState().IsKeyDown(Keys.Right) && (PaddlePosition.X + paddle.Width) != GraphicsDevice.Viewport.Width) PaddlePosition.X += 5;
 
-            if(gameStatus)
+            if (gameStatus)
             {
                 if (directionX)
                 {
@@ -188,7 +219,7 @@ namespace Game1
                 {
                     BallPosition.X -= xCoord;
                 }
-                if(directionY)
+                if (directionY)
                 {
                     BallPosition.Y += yCoord;
                 }
@@ -215,8 +246,10 @@ namespace Game1
             }
             if (BallPosition.Y + ball.Height >= GraphicsDevice.Viewport.Height) //dol
             {
-                directionY = !directionY;
-                score -= 2;
+                //directionY = !directionY;
+                //score -= 2;
+                gameState = GameState.EndOfGame;
+
             }
             if (BallPosition.X >= PaddlePosition.X - ball.Width / 2 &&
                BallPosition.X <= PaddlePosition.X + paddle.Width &&
@@ -224,17 +257,53 @@ namespace Game1
             {
                 if (yCoord > 0) directionY = !directionY;
             }
-            Collision(0);Collision(1);Collision(2);
+            Collision(0); Collision(1); Collision(2);
             // TODO: Add your update logic here
-
-            base.Update(gameTime);
         }
-        
+
+        private void UpdateEndOfGame(GameTime deltaTime)
+        {
+            //if (pushedMainMenuButton)
+            //    gameState = GameState.MainMenu;
+            //else if (pushedNewGameButton)
+            //{
+            //    ResetLevel();
+            //    gameState = GameState.Gameplay;
+            //}
+        }
+
+        private void ResetLevel()
+        {
+
+        }
+
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
+        {
+            base.Draw(gameTime);
+            switch (gameState)
+            {
+                case GameState.MainMenu:
+                    DrawMainMenu(gameTime);
+                    break;
+                case GameState.Gameplay:
+                    DrawGameplay(gameTime);
+                    break;
+                case GameState.EndOfGame:
+                    DrawEndOfGame(gameTime);
+                    break;
+            }
+        }
+
+        void DrawMainMenu(GameTime deltaTime)
+        {
+            // TODO: Draw the main menu, gameStartButton
+        }
+
+        void DrawGameplay(GameTime deltaTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
@@ -242,11 +311,14 @@ namespace Game1
             spriteBatch.Draw(paddle, PaddlePosition);
             for (int i = 0; i < 3; i++) spriteBatch.Draw(wall[i], WallPosition[i]);
             spriteBatch.Draw(ball, BallPosition);
-            spriteBatch.DrawString(font, "Score: "+score.ToString(), new Vector2(25, 50), Color.Black);
+            spriteBatch.DrawString(font, "Score: " + score.ToString(), new Vector2(25, 50), Color.Black);
             spriteBatch.End();
-            // TODO: Add your drawing code here
+        }
 
-            base.Draw(gameTime);
+        void DrawEndOfGame(GameTime deltaTime)
+        {
+            // Draw text and scores
+            // Draw menu with mainMenuButton and newGameButton
         }
     }
 }
