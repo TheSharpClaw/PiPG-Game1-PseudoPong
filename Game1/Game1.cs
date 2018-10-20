@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Drawing;
+using System.IO;
 
 namespace Game1
 {
@@ -13,19 +14,25 @@ namespace Game1
     {
         enum GameState
         {
+            Splash,
             MainMenu,
             Gameplay,
             EndOfGame,
         }
 
-        GameState gameState;
+        GameState gameState = GameState.MainMenu;
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+
+        Texture2D splash;
+
         Vector2 PaddlePosition;
         Texture2D paddle;
+
         Vector2[] WallPosition = new Vector2[3];
         Texture2D[] wall = new Texture2D[3];
+
         Vector2 BallPosition;
         Texture2D ball;
 
@@ -93,6 +100,7 @@ namespace Game1
             for (int i = 0; i < color.Length - 1; i++) color[i] = Color.Orange;
             ball.SetData<Color>(color);
         }
+
         protected void BallControll()
         {
             if (gameStatus)
@@ -101,36 +109,40 @@ namespace Game1
                 BallPosition.Y += 2;
             }
         }
-        protected void CollisionDetector(int index)
-        {
-            //wewnetrzna strona
 
-            if (BallPosition.X <= WallPosition[0].X + wall[0].Width &&
-               BallPosition.Y <= WallPosition[0].Y + wall[0].Height &&
-               BallPosition.X >= WallPosition[0].X)
-            {
-                score++;
-            }
+        //protected void CollisionDetector(int index)
+        //{
+        //    //wewnetrzna strona
 
-            //zewnetrzna stona
+        //    if (BallPosition.X <= WallPosition[0].X + wall[0].Width &&
+        //       BallPosition.Y <= WallPosition[0].Y + wall[0].Height &&
+        //       BallPosition.X >= WallPosition[0].X)
+        //    {
+        //        score++;
+        //    }
 
-            if (BallPosition.Y <= WallPosition[0].Y + wall[0].Height &&
-                BallPosition.X + ball.Width >= WallPosition[0].X &&
-                BallPosition.Y + ball.Height >= WallPosition[1].Y &&
-                BallPosition.X <= WallPosition[2].X + wall[2].Width &&
-                BallPosition.Y <= WallPosition[2].Y + wall[2].Height) ;
+        //    //zewnetrzna stona
 
-        }
+        //    if (BallPosition.Y <= WallPosition[0].Y + wall[0].Height &&
+        //        BallPosition.X + ball.Width >= WallPosition[0].X &&
+        //        BallPosition.Y + ball.Height >= WallPosition[1].Y &&
+        //        BallPosition.X <= WallPosition[2].X + wall[2].Width &&
+        //        BallPosition.Y <= WallPosition[2].Y + wall[2].Height) ;
+        //}
+
         protected void SetWalls()
         {
             DrawWall(0, 120, 40, 40, 160);
             DrawWall(1, 120, 40, 560, 40);
             DrawWall(2, 640, 40, 40, 160);
         }
+
         protected void Collision(int index)
         {
-            if(BallPosition.X + ball.Width >= WallPosition[index].X && BallPosition.X <= WallPosition[index].X + wall[index].Width &&
-               BallPosition.Y <= WallPosition[index].Y + wall[index].Height && BallPosition.Y + ball.Height >= WallPosition[index].Y)
+            if(BallPosition.X + ball.Width >= WallPosition[index].X && 
+               BallPosition.X <= WallPosition[index].X + wall[index].Width &&
+               BallPosition.Y <= WallPosition[index].Y + wall[index].Height && 
+               BallPosition.Y + ball.Height >= WallPosition[index].Y)
             {
                 if (index == 0 | index == 2)
                 {
@@ -161,7 +173,10 @@ namespace Game1
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
             font = Content.Load<SpriteFont>("Score");
+            //splash = Content.Load<Texture2D>("SplashScreen");
+
             // TODO: use this.Content to load your game content here
         }
 
@@ -184,6 +199,9 @@ namespace Game1
             base.Update(gameTime);
             switch (gameState)
             {
+                case GameState.Splash:
+                    UpdateSplash(gameTime);
+                    break;
                 case GameState.MainMenu:
                     UpdateMainMenu(gameTime);
                     break;
@@ -196,6 +214,13 @@ namespace Game1
             }
         }
 
+        private void UpdateSplash(GameTime deltaTime)
+        {
+            // Respond to user input for menu selections, etc
+            //if (pushedStartGameButton)
+           
+        }
+
         private void UpdateMainMenu(GameTime deltaTime)
         {
             // Respond to user input for menu selections, etc
@@ -205,9 +230,11 @@ namespace Game1
 
         private void UpdateGameplay(GameTime deltaTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape)) Exit();
-            if (Keyboard.GetState().IsKeyDown(Keys.Left) && (PaddlePosition.X) != GraphicsDevice.Viewport.X) PaddlePosition.X -= 5;
-            if (Keyboard.GetState().IsKeyDown(Keys.Right) && (PaddlePosition.X + paddle.Width) != GraphicsDevice.Viewport.Width) PaddlePosition.X += 5;
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape)) Exit();
+            if (Keyboard.GetState().IsKeyDown(Keys.Left) && 
+                (PaddlePosition.X) != GraphicsDevice.Viewport.X) PaddlePosition.X -= 5;
+            if (Keyboard.GetState().IsKeyDown(Keys.Right) && 
+                (PaddlePosition.X + paddle.Width) != GraphicsDevice.Viewport.Width) PaddlePosition.X += 5;
 
             if (gameStatus)
             {
@@ -286,6 +313,9 @@ namespace Game1
             base.Draw(gameTime);
             switch (gameState)
             {
+                case GameState.Splash:
+                    DrawSplash(gameTime);
+                    break;
                 case GameState.MainMenu:
                     DrawMainMenu(gameTime);
                     break;
@@ -296,6 +326,19 @@ namespace Game1
                     DrawEndOfGame(gameTime);
                     break;
             }
+        }
+
+        void DrawSplash(GameTime deltaTime)
+        {
+            //FileStream fileStream = new FileStream("C://Users//Rafał//Repos//PIPG//Game1//PiPG-Game1-PseudoPong//Game1//Content//SplashScreen.png", FileMode.Open);
+            //Texture2D splash = Texture2D.FromStream(GraphicsDevice, fileStream);
+            //fileStream.Dispose();
+
+            //spriteBatch.Begin();
+
+            //spriteBatch.Draw(splash, new Rectangle(0, 0, 800, 480), Color.White);
+
+            //spriteBatch.End();
         }
 
         void DrawMainMenu(GameTime deltaTime)
